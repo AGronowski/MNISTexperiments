@@ -25,22 +25,16 @@ description =  str(hidden_layer_size) + "-" + str(hidden_layer_size) + ' ' + opt
 def create_model():
 
     model = keras.models.Sequential([
-        #keras.layers.Dropout(0.2),
+
         # Input layer. Image is 28 x 28 pixels, so layer has 784 nodes
-        #keras.layers.Dropout(0.2),
         keras.layers.Flatten(input_shape=(28, 28)),
 
-        #keras.layers.Dropout(0.5),
+        # 16 node hidden layer with reLu activation function
+        keras.layers.Dense(hidden_layer_size, activation=tf.nn.relu,kernel_initializer=initializer),
 
         # 16 node hidden layer with reLu activation function
         keras.layers.Dense(hidden_layer_size, activation=tf.nn.relu,kernel_initializer=initializer),
 
-        #keras.layers.Dropout(0.5),
-
-        # 16 node hidden layer with reLu activation function
-        keras.layers.Dense(hidden_layer_size, activation=tf.nn.relu,kernel_initializer=initializer),
-        # 512 node hidden layer, no activation function (linear function, o(x) = x)
-        # keras.layers.Dense(512, activation=None),
         # 10 node output layer with softmax activation function
         keras.layers.Dense(10, activation=tf.nn.softmax,kernel_initializer=initializer)
     ])
@@ -59,7 +53,6 @@ def create_model():
     # learning_rate = tf.train.exponential_decay(learning_rate=1e-4, global_step=global_step,
     #                                            decay_steps=2 * steps_per_batch,
     #                                            decay_rate=0.97, staircase=True)
-    #sgd = keras.optimizers.SGD(lr=1e-4, decay=0)
 
     model.compile(optimizer=adam,  # Variation of stochastic gradient descent
                   loss='sparse_categorical_crossentropy',
@@ -78,7 +71,6 @@ def step_decay_schedule(initial_lr, decay_factor, step_size):
         return initial_lr * (decay_factor ** np.floor(epoch / step_size))
 
     return keras.callbacks.LearningRateScheduler(schedule)
-
 
 # Normalizes images to 0 mean and 1 variance
 def normalizeImages(train_images,train_labels,test_images,test_labels):
@@ -116,14 +108,10 @@ def history():
     val_loss = history_callback.history["val_loss"]
     val_acc = history_callback.history["val_acc"]
 
-    # Graph history
-    #plotting.plot_4_history(train_loss, train_acc, val_loss, val_acc,"testDescription")
-
     if amsGrad:
         np.savez('history_ams',train_loss=train_loss,train_acc=train_acc,val_loss=val_loss,val_acc=val_acc)
     else:
         np.savez('history_adam',train_loss=train_loss,train_acc=train_acc,val_loss=val_loss,val_acc=val_acc)
-
 
     # History strings
     train_loss_string = "loss=" + str(train_loss)
@@ -177,9 +165,6 @@ def history():
 mnist = keras.datasets.mnist
 (train_images, train_labels), (test_images, test_labels) = mnist.load_data()
 
-# class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
-#                'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
-
 class_names = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
 
 # Train on only first numMNIST images to reduce computational time
@@ -190,11 +175,9 @@ test_images = test_images[:numTest]
 train_labels = train_labels[:numMNIST]
 test_labels = test_labels[:numTest]
 
-
 # Scale images to have values between 0 and 1
 train_images = train_images / 255.0
 test_images = test_images / 255.0
-
 
 # Create checkpoint callback
 checkpoint_path = "training_1/cp.ckpt"
