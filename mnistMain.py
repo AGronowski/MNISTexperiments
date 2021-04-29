@@ -1,7 +1,4 @@
 # Code for training a neural network with 2 hidden layers on MNIST
-# Can be used to recreate 784-1024-1024-10 baseline from Alemi's paper
-# This program uses Keras so is easier to use than Alemi's original code
-
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
@@ -47,8 +44,6 @@ def create_model():
         # 10 node output layer with softmax activation function
         keras.layers.Dense(10, activation=tf.nn.softmax,kernel_initializer=initializer)
     ])
-
-
 
     # Adam optimizer, lr set to 0 to indicate that it's not being used here; lr controlled by lr_sched callback
     if optimizer == 'adamPaper':
